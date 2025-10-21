@@ -1,0 +1,414 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الطالب - المدرسة الإلكترونية</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>المدرسة الإلكترونية</span>
+            </div>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="menu-item active">
+                <a href="#">
+                    <i class="fas fa-home"></i>
+                    <span>الرئيسية</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="classes.html">
+                    <i class="fas fa-chalkboard"></i>
+                    <span>غرف الصف</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="assignments.html">
+                    <i class="fas fa-tasks"></i>
+                    <span>الواجبات</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="chat.html">
+                    <i class="fas fa-comments"></i>
+                    <span>الدردشة</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="director.html">
+                    <i class="fas fa-envelope"></i>
+                    <span>مراسلة المدير</span>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name" id="studentName">...</div>
+                    <div class="user-role">طالب</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="authManager.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>تسجيل الخروج</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header class="header">
+            <div class="header-title">
+                <h1>لوحة التحكم</h1>
+                <p id="welcomeMessage">مرحباً بك</p>
+            </div>
+            <div class="header-actions">
+                <div class="current-time" id="currentTime"></div>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card" onclick="window.location.href='classes.html'">
+                <div class="stat-icon">
+                    <i class="fas fa-chalkboard"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number" id="classesCount">0</div>
+                    <div class="stat-label">غرف الصف</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+            
+            <div class="stat-card" onclick="window.location.href='assignments.html'">
+                <div class="stat-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number" id="assignmentsCount">0</div>
+                    <div class="stat-label">واجبات جديدة</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+            
+            <div class="stat-card" onclick="window.location.href='assignments.html?filter=submitted'">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number" id="submittedCount">0</div>
+                    <div class="stat-label">واجبات مسلمة</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+            
+            <div class="stat-card" onclick="window.location.href='chat.html'">
+                <div class="stat-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number" id="messagesCount">0</div>
+                    <div class="stat-label">رسائل جديدة</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <!-- الانضمام إلى غرفة صفية -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>الانضمام إلى غرفة صفية</h2>
+                    <p>ادخل رمز الغرفة للانضمام إلى الصف</p>
+                </div>
+                <div class="section-content">
+                    <form id="joinClassroomForm" class="quick-form">
+                        <div class="form-group">
+                            <label for="classCode" class="form-label">رمز الغرفة</label>
+                            <input type="text" id="classCode" class="form-control" placeholder="أدخل الرمز الذي أعطاك إياه المعلم" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i>
+                            الانضمام إلى الغرفة
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- غرف الصف -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>غرف الصف الخاصة بي</h2>
+                    <p>الغرف الصفية التي أنت منتسب إليها</p>
+                </div>
+                <div class="section-content">
+                    <div id="classroomsList" class="items-list">
+                        <div class="empty-state">
+                            <i class="fas fa-chalkboard"></i>
+                            <p>لا توجد غرف صفية</p>
+                            <small>انضم إلى غرفة صفية لتبدأ</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الواجبات القادمة -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>الواجبات القادمة</h2>
+                    <p>الواجبات التي يجب تسليمها قريباً</p>
+                </div>
+                <div class="section-content">
+                    <div id="upcomingAssignments" class="items-list">
+                        <div class="empty-state">
+                            <i class="fas fa-tasks"></i>
+                            <p>لا توجد واجبات قادمة</p>
+                            <small>سيظهر هنا الواجبات الجديدة</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الواجبات المسلمة -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>آخر الواجبات المسلمة</h2>
+                    <p>الواجبات التي قمت بتسليمها مؤخراً</p>
+                </div>
+                <div class="section-content">
+                    <div id="submittedAssignments" class="items-list">
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <p>لا توجد واجبات مسلمة</p>
+                            <small>سيظهر هنا الواجبات التي سلمتها</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = Utils.requireAuth('student');
+            if (!user) return;
+
+            loadUserData();
+            loadDashboardStats();
+            loadClassrooms();
+            loadAssignments();
+            updateTime();
+            setInterval(updateTime, 60000);
+            setupEventListeners();
+        });
+
+        function loadUserData() {
+            const user = Utils.getCurrentUser();
+            if (user) {
+                document.getElementById('studentName').textContent = user.fullName;
+                let welcomeText = `مرحباً بك، ${user.fullName}`;
+                if (user.grade && user.section) {
+                    welcomeText += ` - الصف ${user.grade}${user.section}`;
+                }
+                document.getElementById('welcomeMessage').textContent = welcomeText;
+            }
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ar-SA', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('ar-SA', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('currentTime').innerHTML = `
+                <i class="fas fa-clock"></i>
+                ${timeString} - ${dateString}
+            `;
+        }
+
+        function setupEventListeners() {
+            const joinForm = document.getElementById('joinClassroomForm');
+            if (joinForm) {
+                joinForm.addEventListener('submit', handleJoinClassroom);
+            }
+        }
+
+        async function handleJoinClassroom(e) {
+            e.preventDefault();
+            const classCode = document.getElementById('classCode').value.trim();
+
+            if (!classCode) {
+                alert('يرجى إدخال رمز الغرفة');
+                return;
+            }
+
+            try {
+                const response = await makeRequest('/api/student/classrooms/join', 'POST', {
+                    classCode: classCode
+                });
+
+                if (response.success) {
+                    alert('تم الانضمام إلى الغرفة بنجاح');
+                    document.getElementById('classCode').value = '';
+                    loadClassrooms();
+                    loadDashboardStats();
+                } else {
+                    alert(response.message || 'فشل في الانضمام إلى الغرفة');
+                }
+            } catch (error) {
+                console.error('خطأ في الانضمام للغرفة:', error);
+                alert('حدث خطأ في الاتصال بالخادم');
+            }
+        }
+
+        async function loadDashboardStats() {
+            try {
+                const response = await makeRequest('/api/student/stats', 'GET');
+                if (response.success) {
+                    const stats = response.data;
+                    document.getElementById('classesCount').textContent = stats.classrooms || 0;
+                    document.getElementById('assignmentsCount').textContent = stats.newAssignments || 0;
+                    document.getElementById('submittedCount').textContent = stats.submittedAssignments || 0;
+                    document.getElementById('messagesCount').textContent = stats.newMessages || 0;
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الإحصائيات:', error);
+            }
+        }
+
+        async function loadClassrooms() {
+            try {
+                const response = await makeRequest('/api/student/classrooms', 'GET');
+                if (response.success && response.data.length > 0) {
+                    const classroomsList = document.getElementById('classroomsList');
+                    classroomsList.innerHTML = response.data.map(classroom => `
+                        <div class="list-item" onclick="window.location.href='classes.html?id=${classroom.id}'">
+                            <div class="item-icon">
+                                <i class="fas fa-chalkboard"></i>
+                            </div>
+                            <div class="item-content">
+                                <div class="item-title">${classroom.name}</div>
+                                <div class="item-subtitle">${classroom.subject} - المعلم: ${classroom.teacher_name}</div>
+                                <div class="item-meta">
+                                    <span class="badge badge-secondary">${classroom.student_count} طالب</span>
+                                    <span class="item-date">انضممت في ${Utils.formatDate(classroom.joined_at)}</span>
+                                </div>
+                            </div>
+                            <div class="item-action">
+                                <i class="fas fa-arrow-left"></i>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الغرف:', error);
+            }
+        }
+
+        async function loadAssignments() {
+            try {
+                const response = await makeRequest('/api/student/assignments', 'GET');
+                if (response.success) {
+                    const assignments = response.data;
+                    
+                    // الواجبات القادمة
+                    const upcoming = assignments.filter(a => !a.submitted && new Date(a.due_date) > new Date());
+                    const upcomingList = document.getElementById('upcomingAssignments');
+                    
+                    if (upcoming.length > 0) {
+                        upcomingList.innerHTML = upcoming.map(assignment => `
+                            <div class="list-item" onclick="window.location.href='assignments.html?id=${assignment.id}'">
+                                <div class="item-icon">
+                                    <i class="fas fa-tasks"></i>
+                                </div>
+                                <div class="item-content">
+                                    <div class="item-title">${assignment.title}</div>
+                                    <div class="item-subtitle">${assignment.classroom_name}</div>
+                                    <div class="item-meta">
+                                        <span class="badge badge-warning">ينتهي في ${Utils.formatDate(assignment.due_date)}</span>
+                                    </div>
+                                </div>
+                                <div class="item-action">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+
+                    // الواجبات المسلمة
+                    const submitted = assignments.filter(a => a.submitted);
+                    const submittedList = document.getElementById('submittedAssignments');
+                    
+                    if (submitted.length > 0) {
+                        submittedList.innerHTML = submitted.map(assignment => `
+                            <div class="list-item" onclick="window.location.href='assignments.html?id=${assignment.id}'">
+                                <div class="item-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="item-content">
+                                    <div class="item-title">${assignment.title}</div>
+                                    <div class="item-subtitle">${assignment.classroom_name}</div>
+                                    <div class="item-meta">
+                                        <span class="badge ${assignment.grade ? 'badge-success' : 'badge-secondary'}">
+                                            ${assignment.grade ? `الدرجة: ${assignment.grade}/${assignment.max_points}` : 'بانتظار التصحيح'}
+                                        </span>
+                                        <span class="item-date">سلم في ${Utils.formatDate(assignment.submitted_at)}</span>
+                                    </div>
+                                </div>
+                                <div class="item-action">
+                                    <i class="fas fa-arrow-left"></i>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الواجبات:', error);
+            }
+        }
+
+        async function makeRequest(url, method, data = null) {
+            const token = Utils.getToken();
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(url, options);
+            return await response.json();
+        }
+    </script>
+</body>
+</html>

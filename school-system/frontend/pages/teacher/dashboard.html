@@ -1,0 +1,503 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المعلم - المدرسة الإلكترونية</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- الشريط الجانبي -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <span>المدرسة الإلكترونية</span>
+            </div>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="menu-item active">
+                <a href="#">
+                    <i class="fas fa-home"></i>
+                    <span>الرئيسية</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="classrooms.html">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>الغرف الصفية</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="assignments.html">
+                    <i class="fas fa-tasks"></i>
+                    <span>الواجبات</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="grading.html">
+                    <i class="fas fa-check-circle"></i>
+                    <span>التصحيح</span>
+                    <span class="badge badge-warning" id="pendingCount">0</span>
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="chat.html">
+                    <i class="fas fa-comments"></i>
+                    <span>الدردشة</span>
+                </a>
+            </li>
+        </ul>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name" id="teacherName">...</div>
+                    <div class="user-role">معلم</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="authManager.logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>تسجيل الخروج</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content">
+        <!-- رأس الصفحة -->
+        <header class="header">
+            <div class="header-title">
+                <h1>لوحة التحكم</h1>
+                <p id="welcomeMessage">مرحباً بعودتك</p>
+            </div>
+            <div class="header-actions">
+                <div class="current-time" id="currentTime"></div>
+            </div>
+        </header>
+
+        <!-- الإحصائيات -->
+        <div class="stats-grid">
+            <div class="stat-card" onclick="window.location.href='classrooms.html'">
+                <div class="stat-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number" id="classroomsCount">0</div>
+                    <div class="stat-label">الغرف الصفية</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+            
+            <div class="stat-card" onclick="window.location.href='assignments.html'">
+                <div class="stat-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number" id="assignmentsCount">0</div>
+                    <div class="stat-label">الواجبات</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+            
+            <div class="stat-card" onclick="window.location.href='grading.html'">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number" id="gradingCount">0</div>
+                    <div class="stat-label">بحاجة للتصحيح</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+            
+            <div class="stat-card" onclick="window.location.href='chat.html'">
+                <div class="stat-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-number" id="messagesCount">0</div>
+                    <div class="stat-label">رسائل جديدة</div>
+                </div>
+                <div class="stat-action">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- الإجراءات السريعة -->
+        <div class="content-grid">
+            <!-- إنشاء غرفة صفية -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>إنشاء غرفة صفية جديدة</h2>
+                    <p>أنشئ غرفة صفية وادعُ طلابك للانضمام</p>
+                </div>
+                <div class="section-content">
+                    <form id="createClassroomForm" class="quick-form">
+                        <div class="form-group">
+                            <label for="className" class="form-label">اسم الغرفة الصفية</label>
+                            <input type="text" id="className" class="form-control" placeholder="مثال: الرياضيات - الصف السابع" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="classSubject" class="form-label">المادة</label>
+                            <select id="classSubject" class="form-control" required>
+                                <option value="">اختر المادة</option>
+                                <option value="math">الرياضيات</option>
+                                <option value="arabic">اللغة العربية</option>
+                                <option value="english">اللغة الإنجليزية</option>
+                                <option value="science">العلوم</option>
+                                <option value="history">التاريخ</option>
+                                <option value="geography">الجغرافيا</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="classGrade" class="form-label">الصف</label>
+                            <select id="classGrade" class="form-control" required>
+                                <option value="">اختر الصف</option>
+                                <option value="1">الصف الأول</option>
+                                <option value="2">الصف الثاني</option>
+                                <option value="3">الصف الثالث</option>
+                                <option value="4">الصف الرابع</option>
+                                <option value="5">الصف الخامس</option>
+                                <option value="6">الصف السادس</option>
+                                <option value="7">الصف السابع</option>
+                                <option value="8">الصف الثامن</option>
+                                <option value="9">الصف التاسع</option>
+                                <option value="10">الصف العاشر</option>
+                                <option value="11">الصف الحادي عشر</option>
+                                <option value="12">الصف الثاني عشر</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            إنشاء الغرفة
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- الغرف الصفية النشطة -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>غرفك الصفية</h2>
+                    <p>الغرف الصفية النشطة التي تديرها</p>
+                </div>
+                <div class="section-content">
+                    <div id="classroomsList" class="items-list">
+                        <div class="empty-state">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                            <p>لا توجد غرف صفية بعد</p>
+                            <small>أنشئ غرفتك الصفية الأولى لتبدأ</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الواجبات الأخيرة -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>الواجبات الأخيرة</h2>
+                    <p>الواجبات التي قمت بإنشائها مؤخراً</p>
+                </div>
+                <div class="section-content">
+                    <div id="assignmentsList" class="items-list">
+                        <div class="empty-state">
+                            <i class="fas fa-tasks"></i>
+                            <p>لا توجد واجبات بعد</p>
+                            <small>أنشئ واجبك الأول للطلاب</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الطلاب المنتظرين التصحيح -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2>في انتظار التصحيح</h2>
+                    <p>الواجبات التي تحتاج إلى مراجعتك</p>
+                </div>
+                <div class="section-content">
+                    <div id="gradingList" class="items-list">
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <p>لا توجد واجبات تحتاج تصحيح</p>
+                            <small>سيظهر هنا الواجبات التي يقدمها الطلاب</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة رمز الغرفة -->
+    <div id="classroomCodeModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>تم إنشاء الغرفة بنجاح! 🎉</h2>
+                <button type="button" class="close-btn" onclick="ModalManager.closeModal('classroomCodeModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="classroom-code-container">
+                    <div class="code-display">
+                        <span id="classroomCodeDisplay">XXXXXX</span>
+                    </div>
+                    <p class="code-instructions">شارك هذا الرمز مع طلابك للانضمام إلى الغرفة</p>
+                    <button class="btn btn-secondary" onclick="copyClassroomCode()">
+                        <i class="fas fa-copy"></i>
+                        نسخ الرمز
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="ModalManager.closeModal('classroomCodeModal')">
+                    فهمت
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/auth.js"></script>
+    <script src="../../js/teacher.js"></script>
+    <script>
+        // تهيئة لوحة التحكم
+        document.addEventListener('DOMContentLoaded', function() {
+            // التحقق من المصادقة
+            const user = Utils.requireAuth('teacher');
+            if (!user) return;
+
+            // تحميل بيانات المستخدم
+            loadUserData();
+            
+            // تحميل الإحصائيات
+            loadDashboardStats();
+            
+            // تحميل البيانات
+            loadClassrooms();
+            loadAssignments();
+            loadPendingGrading();
+            
+            // تحديث الوقت
+            updateTime();
+            setInterval(updateTime, 60000);
+            
+            // إعداد النماذج
+            setupEventListeners();
+        });
+
+        function loadUserData() {
+            const user = Utils.getCurrentUser();
+            if (user) {
+                document.getElementById('teacherName').textContent = user.fullName;
+                document.getElementById('welcomeMessage').textContent = `مرحباً بعودتك، ${user.fullName}`;
+            }
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ar-SA', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('ar-SA', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('currentTime').innerHTML = `
+                <i class="fas fa-clock"></i>
+                ${timeString} - ${dateString}
+            `;
+        }
+
+        function setupEventListeners() {
+            // نموذج إنشاء غرفة صفية
+            const createClassroomForm = document.getElementById('createClassroomForm');
+            if (createClassroomForm) {
+                createClassroomForm.addEventListener('submit', handleCreateClassroom);
+            }
+        }
+
+        async function handleCreateClassroom(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                name: document.getElementById('className').value,
+                subject: document.getElementById('classSubject').value,
+                grade: document.getElementById('classGrade').value
+            };
+
+            try {
+                const response = await makeRequest('/api/teacher/classrooms', 'POST', data);
+                
+                if (response.success) {
+                    // عرض رمز الغرفة
+                    showClassroomCode(response.data.code);
+                    // إعادة تعيين النموذج
+                    e.target.reset();
+                    // إعادة تحميل الغرف
+                    loadClassrooms();
+                } else {
+                    alert(response.message || 'حدث خطأ في إنشاء الغرفة');
+                }
+            } catch (error) {
+                console.error('خطأ في إنشاء الغرفة:', error);
+                alert('حدث خطأ في الاتصال بالخادم');
+            }
+        }
+
+        function showClassroomCode(code) {
+            document.getElementById('classroomCodeDisplay').textContent = code;
+            ModalManager.openModal('classroomCodeModal');
+        }
+
+        function copyClassroomCode() {
+            const code = document.getElementById('classroomCodeDisplay').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('تم نسخ الرمز إلى الحافظة');
+            });
+        }
+
+        async function loadDashboardStats() {
+            try {
+                const response = await makeRequest('/api/teacher/stats', 'GET');
+                
+                if (response.success) {
+                    const stats = response.data;
+                    document.getElementById('classroomsCount').textContent = stats.classrooms || 0;
+                    document.getElementById('assignmentsCount').textContent = stats.assignments || 0;
+                    document.getElementById('gradingCount').textContent = stats.pendingGrading || 0;
+                    document.getElementById('messagesCount').textContent = stats.newMessages || 0;
+                    document.getElementById('pendingCount').textContent = stats.pendingGrading || 0;
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الإحصائيات:', error);
+            }
+        }
+
+        async function loadClassrooms() {
+            try {
+                const response = await makeRequest('/api/teacher/classrooms', 'GET');
+                
+                if (response.success && response.data.length > 0) {
+                    const classroomsList = document.getElementById('classroomsList');
+                    classroomsList.innerHTML = response.data.map(classroom => `
+                        <div class="list-item" onclick="window.location.href='classrooms.html?id=${classroom.id}'">
+                            <div class="item-icon">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <div class="item-content">
+                                <div class="item-title">${classroom.name}</div>
+                                <div class="item-subtitle">${classroom.subject} • الصف ${classroom.grade}</div>
+                                <div class="item-meta">
+                                    <span class="badge badge-secondary">${classroom.student_count} طالب</span>
+                                    <span class="item-date">${Utils.formatDate(classroom.created_at)}</span>
+                                </div>
+                            </div>
+                            <div class="item-action">
+                                <i class="fas fa-arrow-left"></i>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الغرف:', error);
+            }
+        }
+
+        async function loadAssignments() {
+            try {
+                const response = await makeRequest('/api/teacher/assignments', 'GET');
+                
+                if (response.success && response.data.length > 0) {
+                    const assignmentsList = document.getElementById('assignmentsList');
+                    assignmentsList.innerHTML = response.data.map(assignment => `
+                        <div class="list-item" onclick="window.location.href='assignments.html?id=${assignment.id}'">
+                            <div class="item-icon">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="item-content">
+                                <div class="item-title">${assignment.title}</div>
+                                <div class="item-subtitle">${assignment.classroom_name}</div>
+                                <div class="item-meta">
+                                    <span class="badge ${assignment.submitted_count > 0 ? 'badge-success' : 'badge-secondary'}">
+                                        ${assignment.submitted_count} / ${assignment.total_students} طالب
+                                    </span>
+                                    <span class="item-date">ينتهي في ${Utils.formatDate(assignment.due_date)}</span>
+                                </div>
+                            </div>
+                            <div class="item-action">
+                                <i class="fas fa-arrow-left"></i>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الواجبات:', error);
+            }
+        }
+
+        async function loadPendingGrading() {
+            try {
+                const response = await makeRequest('/api/teacher/pending-grading', 'GET');
+                
+                if (response.success && response.data.length > 0) {
+                    const gradingList = document.getElementById('gradingList');
+                    gradingList.innerHTML = response.data.map(submission => `
+                        <div class="list-item" onclick="window.location.href='grading.html?submission=${submission.id}'">
+                            <div class="item-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="item-content">
+                                <div class="item-title">${submission.assignment_title}</div>
+                                <div class="item-subtitle">${submission.student_name}</div>
+                                <div class="item-meta">
+                                    <span class="badge badge-warning">بانتظار التصحيح</span>
+                                    <span class="item-date">قدم في ${Utils.formatDate(submission.submitted_at)}</span>
+                                </div>
+                            </div>
+                            <div class="item-action">
+                                <i class="fas fa-arrow-left"></i>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الواجبات المنتظرة:', error);
+            }
+        }
+
+        async function makeRequest(url, method, data = null) {
+            const token = Utils.getToken();
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+
+            const response = await fetch(url, options);
+            return await response.json();
+        }
+    </script>
+</body>
+</html>
